@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\DTO\Users;
 
 final readonly class CreateUserDTO
@@ -8,5 +10,6 @@ final readonly class CreateUserDTO
         public string $name,
         public string $email,
         public string $password,
-    ) {}
+    ) {
+    }
 }

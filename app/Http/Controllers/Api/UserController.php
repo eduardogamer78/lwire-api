@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
@@ -18,9 +20,7 @@ class UserController extends Controller
     {
     }
 
-    /**
-     * Display a listing of the resource.
-     */
+    /** Display a listing of the resource. */
     public function index(Request $request)
     {
         $users = $this->userRepository->getPaginate(
@@ -28,54 +28,48 @@ class UserController extends Controller
             page: $request->page ?? 1,
             filter: $request->get('filter', '')
         );
+
         return UserResource::collection($users);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    /** Store a newly created resource in storage. */
     public function store(UserRequest $request)
     {
         $user = $this->userRepository
-        ->createNew(
-            new CreateUserDTO(
-                ... $request->validated()
-            )
-        );
+            ->createNew(
+                new CreateUserDTO(
+                    ...$request->validated()
+                )
+            );
 
         return new UserResource($user);
     }
 
-    /**
-     * Display the specified resource.
-     */
+    /** Display the specified resource. */
     public function show(string $id)
     {
-        if (!$user = $this->userRepository->findById($id)) {
+        if ( ! $user = $this->userRepository->findById($id)) {
             return response()->json(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
         }
 
         return new UserResource($user);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    /** Update the specified resource in storage. */
     public function update(UpdateUserRequest $request, string $id)
     {
         $response = $this->userRepository->update(new EditUserDTO(...[$id, ...$request->validated()]));
-        if(!$response) {
+        if( ! $response) {
             return response()->json(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
         }
+
         return response()->json(['message' => 'user updated with success']);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    /** Remove the specified resource from storage. */
     public function destroy(string $id)
     {
-        if(!$this->userRepository->delete($id)) {
+        if( ! $this->userRepository->delete($id)) {
             return response()->json(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
         }
 

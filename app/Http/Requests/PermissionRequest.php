@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Http\Requests;
 
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateUserRequest extends FormRequest
+class PermissionRequest extends FormRequest
 {
     /** Determine if the user is authorized to make this request. */
     public function authorize(): bool
@@ -22,8 +23,8 @@ class UpdateUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'min:3', 'max:255'],
-            'password' => ['nullable', 'min:6', 'max:20'],
+            'name' => ['required', 'string', 'min:3', 'max:255', Rule::unique('permissions')->ignore($this->permission)],
+            'description' => ['nullable', 'string', 'min:3', 'max:255'],
         ];
     }
 }
