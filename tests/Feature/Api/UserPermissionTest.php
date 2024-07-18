@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Models\User;
 use App\Models\Permission;
-use App\Http\Middleware\AclPermission;
 
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;

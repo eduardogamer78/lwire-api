@@ -7,8 +7,6 @@ use App\Models\Permission;
 
 use Illuminate\Support\Str;
 
-use App\Http\Middleware\AclPermission;
-
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\putJson;
 use function Pest\Laravel\postJson;
