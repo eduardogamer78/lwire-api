@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\User;
 use App\Models\Permission;
+
 use function Pest\Laravel\getJson;
 
 /** @test Unauthenticated Auth - Get Me */
@@ -23,8 +26,8 @@ it('should return user with nur data', function () {
                 'id',
                 'name',
                 'email',
-             'permissions' => []
-            ]
+                'permissions' => [],
+            ],
         ])
         ->assertOk();
 });
@@ -44,14 +47,14 @@ it('should return user with nur data and our permissions', function () {
                 'id',
                 'name',
                 'email',
-             'permissions' => [
-                 '*' => [
-                     'id',
-                     'name',
-                     'description',
-                 ]
-             ]
-            ]
+                'permissions' => [
+                    '*' => [
+                        'id',
+                        'name',
+                        'description',
+                    ],
+                ],
+            ],
         ])
         ->assertJsonCount(10, 'data.permissions')
         ->assertOk();

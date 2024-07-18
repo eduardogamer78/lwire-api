@@ -1,13 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\User;
 use Illuminate\Support\Str;
+
+use App\Http\Middleware\AclPermission;
 
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\putJson;
 use function Pest\Laravel\postJson;
 use function Pest\Laravel\deleteJson;
-use App\Http\Middleware\AclPermission;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Laravel\withoutMiddleware;
@@ -21,33 +24,33 @@ beforeEach(function () {
 /** @test List users - permissions */
 it('should return 200 - empty database', function () {
     getJson(route('users.index'), [
-        'Authorization' => "Bearer " . $this->access_token,
+        'Authorization' => 'Bearer ' . $this->access_token,
     ])
-      ->assertJsonStructure([
-        'data' => [
-            '*' => [
-               'id', 'name', 'email',
-               'permissions' => []
-            ]
-        ],
-      ])->assertStatus(200);
+        ->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'id', 'name', 'email',
+                    'permissions' => [],
+                ],
+            ],
+        ])->assertStatus(200);
 });
 
 /** @test List many users */
 it('should return 200 - with many users', function () {
     User::factory()->count(20)->create();
     $response = getJson(route('users.index'), [
-        'Authorization' => "Bearer " . $this->access_token,
+        'Authorization' => 'Bearer ' . $this->access_token,
     ])
-      ->assertJsonStructure([
-        'data' => [
-            '*' => [
-               'id', 'name', 'email',
-               'permissions' => []
-            ]
-        ],
-        'meta' => ['total', 'current_page', 'from', 'last_page', 'links' => [], 'path', 'per_page', 'to'],
-      ])->assertStatus(200);
+        ->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'id', 'name', 'email',
+                    'permissions' => [],
+                ],
+            ],
+            'meta' => ['total', 'current_page', 'from', 'last_page', 'links' => [], 'path', 'per_page', 'to'],
+        ])->assertStatus(200);
 
     expect(count($response['data']))->toBe(15);
     expect($response['meta']['total'])->toBe(21);
@@ -59,20 +62,19 @@ it('should return users page 2', function () {
     $response = getJson(
         route('users.index') . '?page=2',
         [
-          'Authorization' => 'Bearer ' . $this->access_token
+            'Authorization' => 'Bearer ' . $this->access_token,
         ]
     )
-    ->assertJsonStructure([
-        'data' => [
-            '*' => ['id', 'name', 'email', 'permissions' => []]
-        ],
-        'meta' => ['total', 'current_page', 'from', 'last_page', 'links' => [], 'path', 'per_page', 'to']
-    ])->assertStatus(200);
+        ->assertJsonStructure([
+            'data' => [
+                '*' => ['id', 'name', 'email', 'permissions' => []],
+            ],
+            'meta' => ['total', 'current_page', 'from', 'last_page', 'links' => [], 'path', 'per_page', 'to'],
+        ])->assertStatus(200);
 
     expect(count($response['data']))->toBe(8);
     expect($response['meta']['total'])->toBe(23);
 });
-
 
 /** @test List Total per page */
 it('should return with total per page', function () {
@@ -80,21 +82,20 @@ it('should return with total per page', function () {
     $response = getJson(
         route('users.index') . '?total_per_page=4',
         [
-          'Authorization' => 'Bearer ' . $this->access_token
+            'Authorization' => 'Bearer ' . $this->access_token,
         ]
     )
-    ->assertJsonStructure([
-        'data' => [
-            '*' => ['id', 'name', 'email', 'permissions' => []]
-        ],
-        'meta' => ['total', 'current_page', 'from', 'last_page', 'links' => [], 'path', 'per_page', 'to']
-    ])->assertStatus(200);
+        ->assertJsonStructure([
+            'data' => [
+                '*' => ['id', 'name', 'email', 'permissions' => []],
+            ],
+            'meta' => ['total', 'current_page', 'from', 'last_page', 'links' => [], 'path', 'per_page', 'to'],
+        ])->assertStatus(200);
 
     expect(count($response['data']))->toBe(4);
     expect($response['meta']['total'])->toBe(17);
     expect($response['meta']['per_page'])->toBe(4);
 });
-
 
 /** @test List filters */
 it('should return with filters', function () {
@@ -103,15 +104,15 @@ it('should return with filters', function () {
     $response = getJson(
         route('users.index') . '?filter=custom_user_name',
         [
-          'Authorization' => 'Bearer ' . $this->access_token
+            'Authorization' => 'Bearer ' . $this->access_token,
         ]
     )
-    ->assertJsonStructure([
-        'data' => [
-            '*' => ['id', 'name', 'email', 'permissions' => []]
-        ],
-        'meta' => ['total', 'current_page', 'from', 'last_page', 'links' => [], 'path', 'per_page', 'to']
-    ])->assertStatus(200);
+        ->assertJsonStructure([
+            'data' => [
+                '*' => ['id', 'name', 'email', 'permissions' => []],
+            ],
+            'meta' => ['total', 'current_page', 'from', 'last_page', 'links' => [], 'path', 'per_page', 'to'],
+        ])->assertStatus(200);
 
     expect(count($response['data']))->toBe(10);
     expect($response['meta']['total'])->toBe(10);
@@ -127,10 +128,10 @@ it('should store new user', function () {
             'password' => 'password',
         ],
         [
-          'Authorization' => 'Bearer ' . $this->access_token
+            'Authorization' => 'Bearer ' . $this->access_token,
         ],
     )
-    ->assertCreated();
+        ->assertCreated();
     assertDatabaseHas('users', [
         'id' => $response['data']['id'],
         'name' => 'john doe',
@@ -143,23 +144,23 @@ describe('validations', function () {
     /** @test Validation - Users store */
     it('should validate create new user', function () {
         postJson(route('users.store'), [], [
-            'Authorization' => 'Bearer ' . $this->access_token
+            'Authorization' => 'Bearer ' . $this->access_token,
         ])->assertStatus(422)
-        ->assertJsonValidationErrors([
-            'name' => trans('validation.required', ['attribute' => 'name']),
-            'email' => trans('validation.required', ['attribute' => 'email']),
-            'password' => trans('validation.required', ['attribute' => 'password']),
-        ]);
+            ->assertJsonValidationErrors([
+                'name' => trans('validation.required', ['attribute' => 'name']),
+                'email' => trans('validation.required', ['attribute' => 'email']),
+                'password' => trans('validation.required', ['attribute' => 'password']),
+            ]);
     });
 
     /** @test Validation - Users Update */
     it('should validate update user', function () {
         putJson(route('users.update', $this->user->id), [], [
-            'Authorization' => 'Bearer ' . $this->access_token
+            'Authorization' => 'Bearer ' . $this->access_token,
         ])->assertStatus(422)
-        ->assertJsonValidationErrors([
-            'name' => trans('validation.required', ['attribute' => 'name'])
-        ]);
+            ->assertJsonValidationErrors([
+                'name' => trans('validation.required', ['attribute' => 'name']),
+            ]);
     });
 
     /** @test Validation - Password - Min */
@@ -168,11 +169,11 @@ describe('validations', function () {
             'name' => 'john doe',
             'password' => '123',
         ], [
-            'Authorization' => 'Bearer ' . $this->access_token
+            'Authorization' => 'Bearer ' . $this->access_token,
         ])->assertStatus(422)
-        ->assertJsonValidationErrors([
-            'password' => trans('validation.min.string', ['attribute' => 'password', 'min' => 6]),
-        ]);
+            ->assertJsonValidationErrors([
+                'password' => trans('validation.min.string', ['attribute' => 'password', 'min' => 6]),
+            ]);
     });
 
     /** @test Validation - Password - Max */
@@ -181,36 +182,36 @@ describe('validations', function () {
             'name' => 'john doe',
             'password' => Str::random(21),
         ], [
-            'Authorization' => 'Bearer ' . $this->access_token
+            'Authorization' => 'Bearer ' . $this->access_token,
         ])->assertStatus(422)
-        ->assertJsonValidationErrors([
-            'password' => trans('validation.max.string', ['attribute' => 'password', 'max' => 20]),
-        ]);
+            ->assertJsonValidationErrors([
+                'password' => trans('validation.max.string', ['attribute' => 'password', 'max' => 20]),
+            ]);
     });
 });
 
 /** @test Show User */
-it('should return user', function (){
+it('should return user', function () {
     $response = getJson(route('users.show', $this->user->id), [
-        'Authorization' => 'Bearer ' . $this->access_token
+        'Authorization' => 'Bearer ' . $this->access_token,
     ])->assertJsonStructure([
-        'data' => ['id', 'name', 'email', 'permissions' => []]
+        'data' => ['id', 'name', 'email', 'permissions' => []],
     ])->assertStatus(200);
 });
 
 /** @test Show User/404 */
 it('should return 404 user not found', function () {
     $response = getJson(route('users.show', 'fake-user'), [
-        'Authorization' => 'Bearer ' . $this->access_token
+        'Authorization' => 'Bearer ' . $this->access_token,
     ])->assertNotFound();
 });
 
 /** @test Update User */
-it('should update user', function (){
+it('should update user', function () {
     putJson(route('users.update', $this->user->id), [
         'name' => 'john doe updated',
     ], [
-        'Authorization' => 'Bearer ' . $this->access_token
+        'Authorization' => 'Bearer ' . $this->access_token,
     ])->assertStatus(200);
 
     assertDatabaseHas('users', [
@@ -224,26 +225,25 @@ it('should update 404 user with error', function () {
     putJson(route('users.update', 'faker-user'), [
         'name' => 'john doe updated',
     ], [
-        'Authorization' => 'Bearer ' . $this->access_token
+        'Authorization' => 'Bearer ' . $this->access_token,
     ])->assertStatus(404);
 });
 
 /** @test Delete User */
 it('should delete user', function () {
     deleteJson(route('users.destroy', $this->user->id), [], [
-        'Authorization' => 'Bearer ' . $this->access_token
+        'Authorization' => 'Bearer ' . $this->access_token,
     ])
-    ->assertNoContent();
+        ->assertNoContent();
     assertDatabaseMissing('users', [
-        'id' => $this->user->id
+        'id' => $this->user->id,
     ]);
 });
 
 /** @test Delete 404 User not found */
 it('should delete 404 user not found', function () {
     deleteJson(route('users.destroy', 'fake_id'), [], [
-        'Authorization' => 'Bearer ' . $this->access_token
+        'Authorization' => 'Bearer ' . $this->access_token,
     ])
-    ->assertNotFound();
+        ->assertNotFound();
 });
-

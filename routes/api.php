@@ -8,14 +8,12 @@ use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\SyncPermissionController;
 
-
 /** Auth Login */
 Route::get('/me', [AuthController::class, 'me'])
     ->middleware('auth:sanctum')->name('auth.me');
 Route::post('/logout', [AuthController::class, 'logout'])
     ->middleware('auth:sanctum')->name('auth.logout');
 Route::post('/auth', [AuthController::class, 'auth'])->name('auth.login');
-
 
 Route::middleware('auth:sanctum', 'acl')->group(function () {
 

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Models\User;
 
 use function Pest\Laravel\postJson;
@@ -14,8 +16,8 @@ it('should auth user', function () {
     ];
 
     postJson(route('auth.login'), $data)
-       ->assertJsonStructure(['access_token'])
-       ->assertStatus(201);
+        ->assertJsonStructure(['access_token'])
+        ->assertStatus(201);
 });
 
 /** @test Password */
@@ -50,9 +52,9 @@ describe('validation', function () {
             'password' => 'password',
             'device' => 'e2e_test',
         ])
-        ->assertJsonValidationErrors([
-            'email' => trans('validation.required', ['attribute' => 'email']),
-        ])->assertStatus(422);
+            ->assertJsonValidationErrors([
+                'email' => trans('validation.required', ['attribute' => 'email']),
+            ])->assertStatus(422);
     });
 
     it('should require password', function () {
@@ -61,9 +63,9 @@ describe('validation', function () {
             'email' => $user->email,
             'device' => 'e2e_test',
         ])
-        ->assertJsonValidationErrors([
-            'password' => trans('validation.required', ['attribute' => 'password']),
-        ])->assertStatus(422);
+            ->assertJsonValidationErrors([
+                'password' => trans('validation.required', ['attribute' => 'password']),
+            ])->assertStatus(422);
     });
 
     it('should require device name', function () {
@@ -72,9 +74,9 @@ describe('validation', function () {
             'email' => $user->email,
             'password' => 'password',
         ])
-        ->assertJsonValidationErrors([
-            'device' => trans('validation.required', ['attribute' => 'device']),
-        ])->assertStatus(422);
+            ->assertJsonValidationErrors([
+                'device' => trans('validation.required', ['attribute' => 'device']),
+            ])->assertStatus(422);
     });
 
 });

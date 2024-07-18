@@ -11,7 +11,6 @@ use App\DTO\Users\CreateUserDTO;
 use App\Http\Requests\UserRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
-use Illuminate\Database\Eloquent\Collection;
 use App\Repositories\UserRepository;
 use App\Http\Requests\UpdateUserRequest;
 
@@ -29,9 +28,9 @@ class UserController extends Controller
             page: $request->page ?? 1,
             filter: $request->get('filter', ''),
         );
+
         return UserResource::collection($users);
     }
-
 
     /** Store a newly created resource in storage. */
     public function store(UserRequest $request)
@@ -49,7 +48,7 @@ class UserController extends Controller
     /** Display the specified resource. */
     public function show(string $id)
     {
-        if (! $user = $this->userRepository->findById($id, ['permissions'])) {
+        if ( ! $user = $this->userRepository->findById($id, ['permissions'])) {
             return response()->json(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
         }
 
@@ -60,7 +59,7 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, string $id)
     {
         $response = $this->userRepository->update(new EditUserDTO(...[$id, ...$request->validated()]));
-        if(! $response) {
+        if( ! $response) {
             return response()->json(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
         }
 
@@ -70,7 +69,7 @@ class UserController extends Controller
     /** Remove the specified resource from storage. */
     public function destroy(string $id)
     {
-        if(! $this->userRepository->delete($id)) {
+        if( ! $this->userRepository->delete($id)) {
             return response()->json(['message' => 'User not found'], Response::HTTP_NOT_FOUND);
         }
 
